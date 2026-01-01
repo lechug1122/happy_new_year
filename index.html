@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Feliz Año Nuevo, Mi Amor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+
+        body {
+            background: radial-gradient(circle at bottom, #14001f, #000000);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .carta {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+            margin: 8vh auto;
+            background: rgba(20, 0, 30, 0.75);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.4);
+            animation: fadeIn 2.5s ease;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffb6c1;
+            margin-bottom: 20px;
+            font-size: clamp(1.6rem, 5vw, 2.3rem);
+        }
+
+        .foto-container {
+            display: flex;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        .foto-container img {
+            width: clamp(160px, 45vw, 240px);
+            height: clamp(160px, 45vw, 240px);
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ff69b4;
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.6);
+        }
+
+        p {
+            line-height: 1.8;
+            font-size: clamp(1rem, 4.5vw, 1.15rem);
+            text-align: justify;
+            margin-bottom: 14px;
+        }
+
+        /* PREGUNTA */
+        .pregunta {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .pregunta h2 {
+            color: #ffd1dc;
+            margin-bottom: 20px;
+            font-size: clamp(1.2rem, 5vw, 1.6rem);
+        }
+
+        .botones {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .botones button {
+            padding: 12px 26px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: white;
+            box-shadow: 0 0 15px rgba(255,105,180,0.6);
+            transition: transform 0.2s ease;
+        }
+
+        .botones button:hover {
+            transform: scale(1.1);
+        }
+
+        .respuesta {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffb6c1;
+            display: none;
+        }
+
+        .firma {
+            margin-top: 35px;
+            text-align: right;
+            font-style: italic;
+            color: #ff69b4;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .carta {
+                margin: 6vh 16px;
+                padding: 28px 22px;
+            }
+
+            .firma {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="carta">
+    <h1>💖 Feliz Año Nuevo, Mi Amor 💖</h1>
+
+    <div class="foto-container">
+        <img src="img.jpeg" alt="Nosotros">
+    </div>
+
+    <p>
+        Un nuevo año comienza y no puedo imaginarlo sin ti. Gracias por ser mi refugio,
+        mi alegría diaria y la razón por la que cada día quiero ser mejor.
+    </p>
+
+    <p>
+        Este año quiero seguir tomándote de la mano, celebrando tus logros, secando tus
+        lágrimas y construyendo recuerdos contigo.
+    </p>
+
+    <!-- PREGUNTA -->
+    <div class="pregunta">
+        <h2>¿Quieres que iniciemos un 2026 juntos? 💖</h2>
+        <div class="botones">
+            <button onclick="responder()">Sí 💕</button>
+            <button onclick="responder()">Siempre 💍</button>
+        </div>
+        <div class="respuesta" id="respuesta">
+            Entonces que sea contigo, hoy, mañana y siempre ✨💖
+        </div>
+    </div>
+
+    <div class="firma">
+        Siempre tuyo,<br>
+        ❤️ Con todo mi amor ❤️
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.radius = Math.random() * 2 + 1;
+            this.color = color;
+            this.speedX = (Math.random() - 0.5) * 6;
+            this.speedY = (Math.random() - 0.5) * 6;
+            this.life = 100;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.life--;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+    }
+
+    let particles = [];
+
+    function createFirework(extra = false) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * 0.5;
+        const colors = ["#ff69b4", "#ffd1dc", "#ffffff", "#ff1493"];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const cantidad = extra ? 150 : 80;
+
+        for (let i = 0; i < cantidad; i++) {
+            particles.push(new Particle(x, y, color));
+        }
+    }
+
+    function animate() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => {
+            p.update();
+            p.draw();
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+        requestAnimationFrame(animate);
+    }
+
+    setInterval(() => createFirework(false), 1000);
+    animate();
+
+    function responder() {
+        document.getElementById("respuesta").style.display = "block";
+        for (let i = 0; i < 4; i++) {
+            setTimeout(() => createFirework(true), i * 300);
+        }
+    }
+</script>
+
+</body>
+</html>
